@@ -5,7 +5,7 @@ import java.text.Normalizer.Form;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public class SlugUtil {
+public class SlugUtils {
 
 	  private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
 	  

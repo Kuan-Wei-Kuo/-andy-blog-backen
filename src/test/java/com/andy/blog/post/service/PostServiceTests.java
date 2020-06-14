@@ -1,4 +1,5 @@
 package com.andy.blog.post.service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,8 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.andy.blog.BlogServerApplication;
+import com.andy.blog.exception.RestException;
 import com.andy.blog.post.entity.Post;
-import com.andy.blog.post.exception.PostException;
 import com.andy.blog.post.model.PostRequest;
 import com.andy.blog.post.service.PostService;
 
@@ -47,7 +48,7 @@ public class PostServiceTests {
 				Assert.assertTrue(true);
 			else
 				Assert.assertTrue(false);
-		} catch (PostException e) {
+		} catch (RestException e) {
 			e.printStackTrace();
 		}
 	}
@@ -63,7 +64,7 @@ public class PostServiceTests {
 		postRequest.setPublish(true);
 		postRequest.setCategories(categories);
 		
-		Assert.assertThrows(PostException.class, () -> {postService.addPost(postRequest);});
+		Assert.assertThrows(RestException.class, () -> {postService.addPost(postRequest);});
 	}
 	
 	@Test
@@ -86,7 +87,7 @@ public class PostServiceTests {
 			} else {
 				Assert.assertTrue(false);
 			}
-		} catch (PostException e) {
+		} catch (RestException e) {
 			e.printStackTrace();
 		}
 	}
@@ -139,7 +140,7 @@ public class PostServiceTests {
 			postService.deletePostById(1);
 			List<Post> posts = postService.getPosts();
 			Assert.assertEquals(0, posts.size());
-		} catch (PostException e) {
+		} catch (RestException e) {
 			e.printStackTrace();
 		}
 	}

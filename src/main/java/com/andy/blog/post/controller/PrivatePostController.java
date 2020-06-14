@@ -17,17 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.andy.blog.model.Message;
 import com.andy.blog.post.dto.PageDto;
 import com.andy.blog.post.entity.Post;
-import com.andy.blog.post.exception.PostException;
 import com.andy.blog.post.model.PostRequest;
 import com.andy.blog.post.service.PostService;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/priv")
-public class PrivPostController {
+@RequestMapping("/private")
+public class PrivatePostController {
 
 	@Autowired
 	private PostService postService;
@@ -61,19 +59,9 @@ public class PrivPostController {
 	}
 	
 	@DeleteMapping(value = "/api/posts/{id}")
-	public Message deletePost(@PathVariable("id") int id) {
-		Message message = new Message();
-		message.setStatusCode(500);
-		message.setMessage("Fail");
-		try {
-			postService.deletePostById(id);
-			message.setStatusCode(200);
-			message.setMessage("Delete Post Successfull");
-		} catch (PostException e) {
-			message.setStatusCode(404);
-			message.setMessage("Invalid ID[" + id + "]");
-		}
-		return message;
+	public Post deletePost(@PathVariable("id") int id) {
+		Optional<Post> optional =  postService.deletePostById(id);
+		return optional.get();
 	}
 
 	private PageDto<Post> convertToDto(Page<Post> page) {

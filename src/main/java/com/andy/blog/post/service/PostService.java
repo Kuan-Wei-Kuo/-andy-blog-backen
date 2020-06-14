@@ -15,14 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.andy.blog.exception.DuplicateException;
+import com.andy.blog.exception.NotFoundException;
 import com.andy.blog.post.entity.Post;
-import com.andy.blog.post.exception.PostException;
 import com.andy.blog.post.model.PostRequest;
 import com.andy.blog.post.repository.PostRepository;
-import com.andy.blog.post.util.SlugUtil;
+import com.andy.blog.post.util.SlugUtils;
 
 @Service
 public class PostService {
@@ -54,9 +54,9 @@ public class PostService {
 		return new ArrayList<Post>(postMap.values());
 	}
 
-	public Optional<Post> getPostById(int id) throws PostException {
-		if (!postMap.containsKey(id))
-			throw new PostException(HttpStatus.NOT_FOUND, "Not found post id : " + id);
+	public Optional<Post> getPostById(int id) {
+		if (!hasPost(id))
+			throw new NotFoundException(String.format("Not found post, post id: ", id));
 		return Optional.ofNullable(postMap.get(id));
 	}
 
@@ -67,14 +67,14 @@ public class PostService {
 			if (post.getSlug().equals(slug))
 				return Optional.ofNullable(post);
 		}
-		throw new PostException(HttpStatus.NOT_FOUND, "Not found post slug : " + slug);
+		throw new NotFoundException(String.format("Not found post, post slug: ", slug));
 	}
 
-	public Optional<Post> addPost(PostRequest postRequest) throws PostException {
+	public Optional<Post> addPost(PostRequest postRequest) {
 		if(hasTitle(postRequest.getTitle()))
-			throw new PostException(HttpStatus.CONFLICT, "Duplicat post title : " + postRequest.getTitle());
+			throw new DuplicateException(String.format("Duplicat post title, title: ", postRequest.getTitle()));
 		
-		String slug = SlugUtil.toSlug(postRequest.getTitle());
+		String slug = SlugUtils.toSlug(postRequest.getTitle());
 		
 		Post post = new Post();
 		post.setTitle(postRequest.getTitle());
@@ -92,18 +92,18 @@ public class PostService {
 		return Optional.ofNullable(post);
 	}
 
-	public Optional<Post> updatePost(int id, PostRequest postRequest) throws PostException {
+	public Optional<Post> updatePost(int id, PostRequest postRequest) {
 		if (!hasPost(id))
-			throw new PostException(HttpStatus.NOT_FOUND, "Not found post id : " + id);
+			throw new NotFoundException(String.format("Not found post, post id: ", id));
 		
 		Post post = postMap.get(id);
 		
 		if(!Objects.equals(post.getTitle(), postRequest.getTitle())) {
 			if(hasTitle(postRequest.getTitle()))
-				throw new PostException(HttpStatus.CONFLICT, "Duplicat post title : " + postRequest.getTitle());
+				throw new DuplicateException(String.format("Duplicat post title, title: ", postRequest.getTitle()));
 		}
 		
-		String newSlug = SlugUtil.toSlug(postRequest.getTitle());
+		String newSlug = SlugUtils.toSlug(postRequest.getTitle());
 		post.setTitle(postRequest.getTitle());
 		post.setContent(postRequest.getContent());
 		post.setPublish(postRequest.isPublish());
@@ -118,11 +118,13 @@ public class PostService {
 		return Optional.ofNullable(post);
 	}
 
-	public void deletePostById(int id) throws PostException {
+	public Optional<Post> deletePostById(int id) {
 		if (!hasPost(id))
-			throw new PostException(HttpStatus.NOT_FOUND, "Not found post id : " + id);
-		postRepository.deleteById(id);
+			throw new NotFoundException(String.format("Not found post, post id: ", id));
+		Post post = postMap.get(id);
+		postRepository.delete(post);
 		postMap.remove(id);
+		return Optional.ofNullable(post);
 	}
 	
 	private boolean hasPost(int id) {

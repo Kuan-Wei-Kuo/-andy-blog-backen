@@ -22,7 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.andy.blog.BlogServerApplication;
 import com.andy.blog.post.entity.Post;
 import com.andy.blog.post.repository.PostRepository;
-import com.andy.blog.post.util.SlugUtil;
+import com.andy.blog.post.util.SlugUtils;
 
 @ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,7 +45,7 @@ public class PostRepositoryTests {
 		post.setPublish(true);
 		post.setCreateTime(new Date());
 		post.setModifyTime(new Date());
-		post.setSlug(SlugUtil.toSlug(post.getTitle()));
+		post.setSlug(SlugUtils.toSlug(post.getTitle()));
 		post.setCategories(categories);
 		post = postRepository.save(post);
 		
@@ -67,7 +67,7 @@ public class PostRepositoryTests {
 		post.setPublish(true);
 		post.setCreateTime(new Date());
 		post.setModifyTime(new Date());
-		post.setSlug(SlugUtil.toSlug(post.getTitle()));
+		post.setSlug(SlugUtils.toSlug(post.getTitle()));
 		post.setCategories(categories);
 		post = postRepository.save(post);
 		
@@ -89,7 +89,7 @@ public class PostRepositoryTests {
 		post.setPublish(true);
 		post.setCreateTime(new Date());
 		post.setModifyTime(new Date());
-		post.setSlug(SlugUtil.toSlug(post.getTitle()));
+		post.setSlug(SlugUtils.toSlug(post.getTitle()));
 		post.setCategories(categories);
 		post = postRepository.save(post);
 		

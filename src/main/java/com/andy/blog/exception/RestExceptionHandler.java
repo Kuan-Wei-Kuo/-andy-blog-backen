@@ -13,8 +13,8 @@ import com.andy.blog.model.Message;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(WeblogException.class)
-	public ResponseEntity<Message> handleWeblogException(WeblogException ex, WebRequest req) {
+	@ExceptionHandler(RestException.class)
+	public ResponseEntity<Message> handleWeblogException(RestException ex, WebRequest req) {
 		Message message = new Message();
 		message.setStatusCode(ex.getStatus().value());
 		message.setMessage(ex.getMessage());
