@@ -1,5 +1,6 @@
 package com.andy.blog.config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +12,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.andy.blog.filter.JwtAuthenticationFilter;
+import com.andy.blog.filter.JwtAuthorizationFilter;
 import com.andy.blog.provider.JwtProvider;
 
 @Configuration
@@ -46,6 +50,12 @@ public class WebScurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JwtProvider jwtProvider;
 	
+	@Autowired
+	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	
 	@Bean
 	public CorsConfigurationSource configurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
@@ -65,17 +75,24 @@ public class WebScurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 	
+	@Bean
+	public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
+		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+		manager.createUser(new User(username, passwordEncoder().encode(password), new ArrayList<>()));
+		return manager;
+	}
+	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()
-			.withUser(username)
-			.password(passwordEncoder().encode(password));
+		auth.userDetailsService(inMemoryUserDetailsManager()).passwordEncoder(passwordEncoder());
 	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.cors()
+				.disable()
+			.csrf()
 				.disable()
 			.sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -90,11 +107,11 @@ public class WebScurityConfig extends WebSecurityConfigurerAdapter {
 				.disable()
 			.logout()
 				.disable()
-			.addFilterBefore(new JwtAuthenticationFilter(authenticationManager, jwtProvider), UsernamePasswordAuthenticationFilter.class);
-			.addFilterBefore(filter, beforeFilter);
+			.addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtProvider))
+			.addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtProvider, userDetailsService));
 			
 		http.exceptionHandling()
-			.authenticationEntryPoint(authenticationEntryPoint);
+			.authenticationEntryPoint(jwtAuthenticationEntryPoint);
 	}
 	
 }

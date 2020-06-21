@@ -21,13 +21,13 @@ public class JwtProvider {
 
 	private static ConcurrentHashMap<String, String> jtiMap = new ConcurrentHashMap<String, String>();
 	
-	@Value("${jwt.access.expired}")
+	@Value("${jwt.access.expiration.time}")
 	private long accessExpired;
 	
 	@Value("${jwt.access.secret}")
 	private String accessSecret;
 	
-	@Value("${jwt.access.expired}")
+	@Value("${jwt.refresh.expiration.time}")
 	private long refreshExpired;
 
 	@Value("${jwt.refresh.secret}")
@@ -36,7 +36,7 @@ public class JwtProvider {
 	public String createAccessToken(String username) {
 		String jti = getJti(username);
 		Date now = new Date();
-		Date expiration = new Date(now.getTime() + accessExpired);
+		Date expiration = new Date(now.getTime() + accessExpired * 1000);
 		return Jwts.builder()
 			.setId(jti)
 			.setSubject(username)
@@ -50,7 +50,7 @@ public class JwtProvider {
 	public String createRefreshToken(String username) {
 		String jti = getJti(username);
 		Date now = new Date();
-		Date expiration = new Date(now.getTime() + refreshExpired);
+		Date expiration = new Date(now.getTime() + refreshExpired * 1000);
 		return Jwts.builder()
 			.setId(jti)
 			.setSubject(username)
