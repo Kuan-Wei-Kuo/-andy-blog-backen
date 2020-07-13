@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /andy.blog
+spring:
+  profiles:
+    active: dev
+
+# Jwt Security
+dashboard: 
+  username: admin
+  password: admin
+
+jwt:
+  issuer: andy-blog
+  audience: andy-blog-dashboard
+  access:
+    expiration:
+      time: 86400
+    secret: jwt.access.secret
+  refresh:
+    expiration:
+      time: 864000
+    secret: jwt.refresh.secret
+
+cors:
+  allowed:
+    origins: http://localhost:8080
+    methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    headers: Authorization, Content-Type
+  exposed:
+    headers: Authorization

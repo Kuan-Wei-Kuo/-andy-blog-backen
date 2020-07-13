@@ -10,8 +10,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import com.andy.blog.post.entity.Post;
 
 public interface PostRepository extends PagingAndSortingRepository<Post, Integer> {
-	
+
+	@Query(value = "SELECT a FROM Post a WHERE a.slug = ?1")
 	Optional<Post> findBySlug(String slug);
+
+	@Query(value = "SELECT a FROM Post a WHERE a.slug = ?1 AND a.id != ?2")
+	Optional<Post> findBySlugAndIdNotEq(String slug, int id);
 	
 	@Query(value = "SELECT a FROM Post a WHERE a.publish = ?1")
 	Page<Post> findByPublish(boolean publish, Pageable pageable);

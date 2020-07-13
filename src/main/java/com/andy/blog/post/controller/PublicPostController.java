@@ -2,7 +2,6 @@ package com.andy.blog.post.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +41,7 @@ public class PublicPostController {
 	
 	@GetMapping(value = "/api/posts/{slug}")
 	public PostDto getPostBySlug(@PathVariable("slug") String slug) {
-		Optional<Post> optional = postService.getPostBySlug(slug);
-		return convertToDto(optional.get());
+		return convertToDto(postService.getPostBySlug(slug));
 	}
 	
 	private PageDto<PostDto> convertToDto(Page<Post> page) {

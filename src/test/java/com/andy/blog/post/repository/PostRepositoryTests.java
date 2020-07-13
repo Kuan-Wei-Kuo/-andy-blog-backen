@@ -9,7 +9,6 @@ import javax.transaction.Transactional;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -17,16 +16,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.andy.blog.BlogServerApplication;
 import com.andy.blog.post.entity.Post;
 import com.andy.blog.post.repository.PostRepository;
 import com.andy.blog.post.util.SlugUtils;
 
 @ActiveProfiles("test")
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = BlogServerApplication.class)
+@SpringBootTest()
 public class PostRepositoryTests {
 	
 	@Autowired

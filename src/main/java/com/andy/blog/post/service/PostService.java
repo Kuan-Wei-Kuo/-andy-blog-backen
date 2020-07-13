@@ -1,15 +1,9 @@
 package com.andy.blog.post.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,14 +24,6 @@ public class PostService {
 	@Autowired
 	private PostRepository postRepository;
 
-	private ConcurrentHashMap<Integer, Post> postMap = new ConcurrentHashMap<Integer, Post>();
-
-	@PostConstruct
-	public void init() {
-		Iterable<Post> iterable = postRepository.findAll();
-		iterable.forEach(post -> postMap.put(post.getId(), post));
-	}
-
 	public Page<Post> getPosts(int page, int size) {
 		return postRepository.findAll(PageRequest.of(page, size, Sort.by("createTime").descending()));
 	}
@@ -51,30 +37,38 @@ public class PostService {
 	}
 
 	public List<Post> getPosts() {
-		return new ArrayList<Post>(postMap.values());
-	}
-
-	public Optional<Post> getPostById(int id) {
-		if (!hasPost(id))
-			throw new NotFoundException(String.format("Not found post, post id: ", id));
-		return Optional.ofNullable(postMap.get(id));
-	}
-
-	public Optional<Post> getPostBySlug(String slug) {
-		Iterator<Post> it = postMap.values().iterator();
-		while (it.hasNext()) {
-			Post post = it.next();
-			if (post.getSlug().equals(slug))
-				return Optional.ofNullable(post);
-		}
-		throw new NotFoundException(String.format("Not found post, post slug: ", slug));
-	}
-
-	public Optional<Post> addPost(PostRequest postRequest) {
-		if(hasTitle(postRequest.getTitle()))
-			throw new DuplicateException(String.format("Duplicat post title, title: ", postRequest.getTitle()));
+		List<Post> posts = new ArrayList<>();
 		
+		Iterable<Post> iterable = postRepository.findAll();
+		iterable.forEach(post -> posts.add(post));
+		
+		return posts;
+	}
+
+	public Post getPostById(int id) {
+		Optional<Post> optional = postRepository.findById(id);
+		
+		if (!optional.isPresent())
+			throw new NotFoundException(String.format("Not found post, post id: ", id));
+		
+		return optional.get();
+	}
+
+	public Post getPostBySlug(String slug) {
+		Optional<Post> optional = postRepository.findBySlug(slug);
+		
+		if (!optional.isPresent())
+			throw new NotFoundException(String.format("Not found post, post slug: ", slug));
+		
+		return optional.get();
+	}
+
+	public Post addPost(PostRequest postRequest) {
 		String slug = SlugUtils.toSlug(postRequest.getTitle());
+
+		Optional<Post> optional = postRepository.findBySlug(slug);
+		if(optional.isPresent())
+			throw new DuplicateException(String.format("Duplicat post title, title: ", postRequest.getTitle()));
 		
 		Post post = new Post();
 		post.setTitle(postRequest.getTitle());
@@ -87,60 +81,37 @@ public class PostService {
 		
 		post = postRepository.save(post);
 		
-		postMap.put(post.getId(), post);
-		
-		return Optional.ofNullable(post);
+		return post;
 	}
 
-	public Optional<Post> updatePost(int id, PostRequest postRequest) {
-		if (!hasPost(id))
-			throw new NotFoundException(String.format("Not found post, post id: ", id));
+	public Post updatePost(int id, PostRequest postRequest) {
+		Post post = getPostById(id);
+
+		String slug = SlugUtils.toSlug(postRequest.getTitle());
 		
-		Post post = postMap.get(id);
+		Optional<Post> optional = postRepository.findBySlugAndIdNotEq(slug, id);
 		
-		if(!Objects.equals(post.getTitle(), postRequest.getTitle())) {
-			if(hasTitle(postRequest.getTitle()))
-				throw new DuplicateException(String.format("Duplicat post title, title: ", postRequest.getTitle()));
-		}
+		if(optional.isPresent())
+			throw new DuplicateException(String.format("Duplicat post title, title: ", postRequest.getTitle()));
 		
-		String newSlug = SlugUtils.toSlug(postRequest.getTitle());
 		post.setTitle(postRequest.getTitle());
 		post.setContent(postRequest.getContent());
 		post.setPublish(postRequest.isPublish());
 		post.setCategories(postRequest.getCategories());
 		post.setModifyTime(new Date());
-		post.setSlug(newSlug);
+		post.setSlug(slug);
 		
 		post = postRepository.save(post);
 		
-		postMap.put(post.getId(), post);
-		
-		return Optional.ofNullable(post);
+		return post;
 	}
 
-	public Optional<Post> deletePostById(int id) {
-		if (!hasPost(id))
-			throw new NotFoundException(String.format("Not found post, post id: ", id));
-		Post post = postMap.get(id);
+	public Post deletePostById(int id) {
+		Post post = getPostById(id);
+		
 		postRepository.delete(post);
-		postMap.remove(id);
-		return Optional.ofNullable(post);
-	}
-	
-	private boolean hasPost(int id) {
-		return postMap.containsKey(id);
-	}
-	
-	private boolean hasTitle(String title) {
-		Collection<Post> posts = postMap.values();
-		Iterator<Post> it = posts.iterator();
-		while(it.hasNext()) {
-			Post post = it.next();
-			if(post.getTitle().equals(title)) {
-				return true;
-			}
-		}
-		return false;
+		
+		return post;
 	}
 
 }

@@ -13,7 +13,7 @@ import com.andy.blog.category.service.CategoryService;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/categories")
+@RequestMapping("/public/api/categories")
 public class CategoryController {
 
 	@Autowired

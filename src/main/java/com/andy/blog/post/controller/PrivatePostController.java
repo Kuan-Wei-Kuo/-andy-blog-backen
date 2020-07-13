@@ -2,7 +2,6 @@ package com.andy.blog.post.controller;
 
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,26 +41,22 @@ public class PrivatePostController {
 
 	@GetMapping(value = "/api/posts/{id}")
 	public Post getPostById(@PathVariable("id") int id) {
-		Optional<Post> optional = postService.getPostById(id);
-		return optional.get();
+		return postService.getPostById(id);
 	}
 	
 	@PostMapping(value = "/api/posts")
 	public Post addPost(@RequestBody PostRequest postRequest) {
-		Optional<Post> optional = postService.addPost(postRequest);
-		return optional.get();
+		return postService.addPost(postRequest);
 	}
 	
 	@PutMapping(value = "/api/posts/{id}")
 	public Post updatePost(@PathVariable("id") int id, @RequestBody PostRequest PostRequest) {
-		Optional<Post> optional =  postService.updatePost(id, PostRequest);
-		return optional.get();
+		return postService.updatePost(id, PostRequest);
 	}
 	
 	@DeleteMapping(value = "/api/posts/{id}")
 	public Post deletePost(@PathVariable("id") int id) {
-		Optional<Post> optional =  postService.deletePostById(id);
-		return optional.get();
+		return postService.deletePostById(id);
 	}
 
 	private PageDto<Post> convertToDto(Page<Post> page) {

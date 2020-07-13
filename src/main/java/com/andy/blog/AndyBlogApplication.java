@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootApplication
 @EnableWebMvc
-public class BlogServerApplication extends SpringBootServletInitializer {
+public class AndyBlogApplication extends SpringBootServletInitializer {
 	
 	@Bean
 	public ModelMapper modelMapper() {
@@ -19,11 +19,11 @@ public class BlogServerApplication extends SpringBootServletInitializer {
 	
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(BlogServerApplication.class);
+		return application.sources(AndyBlogApplication.class);
 	}
 	
 	public static void main(String[] args) {
-		SpringApplication.run(BlogServerApplication.class, args);
+		SpringApplication.run(AndyBlogApplication.class, args);
 	}
 
 }

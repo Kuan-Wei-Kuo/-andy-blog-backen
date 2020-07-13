@@ -26,7 +26,6 @@ dependencies {
 	compile group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testCompile group: 'junit', name: 'junit', version: '4.13'
 	testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
 	
 }

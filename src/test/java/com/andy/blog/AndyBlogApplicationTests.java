@@ -1,4 +1,4 @@
-package com.andy.blog.core;
+package com.andy.blog;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class BlogServerApplicationTests {
+public class AndyBlogApplicationTests {
 
 	@Test
 	public void contextLoads() {
