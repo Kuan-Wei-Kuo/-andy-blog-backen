@@ -16,8 +16,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.andy.blog.model.ApplicationUser;
+import com.andy.blog.model.Token;
 import com.andy.blog.provider.JwtProvider;
-import com.andy.blog.util.SecurityConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -47,8 +47,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		User user = (User) authResult.getPrincipal();
-		String token = jwtProvider.createAccessToken(user.getUsername());
-        response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+		
+		String accessToken = jwtProvider.createAccessToken(user.getUsername());
+		String refreshToken = jwtProvider.createRefreshToken(user.getUsername());
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+        response.getWriter().print(objectMapper.writeValueAsString(new Token(accessToken, refreshToken)));
+        response.getWriter().flush();
 	}
 
 }

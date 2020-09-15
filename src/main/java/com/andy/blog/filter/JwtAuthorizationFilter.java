@@ -65,8 +65,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		try {
 			String token = authorizationString.replace(SecurityConstants.TOKEN_PREFIX, "");
 			String username = jwtProvider.getUsernameByAccessToken(token);
-			if(!Objects.isNull(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
+			if(Objects.nonNull(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
 				if(jwtProvider.validateAccessToken(token)) {
+					System.out.println(username);
 					UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 					SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -76,6 +77,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			logger.error("Failed to set user authentication is security context: ", e);
 			throw e;
 		}
+		
+		filterChain.doFilter(request, response);
 	}
 
 }

@@ -1,11 +1,9 @@
 package com.andy.blog.post.controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,40 +19,41 @@ import com.andy.blog.post.entity.Post;
 import com.andy.blog.post.model.PostRequest;
 import com.andy.blog.post.service.PostService;
 
-@CrossOrigin
 @RestController
-@RequestMapping("/private")
+@RequestMapping("/private/api/posts")
 public class PrivatePostController {
 
 	@Autowired
 	private PostService postService;
 	
-	@GetMapping(value = "/api/posts")
+	@GetMapping
 	public List<Post> getPosts() {
+		System.out.println(postService.getPosts().size());
 		return postService.getPosts();
 	}
 	
-	@GetMapping(value = "/api/posts", params = {"page", "size"})
+	@GetMapping(params = {"page", "size"})
 	public PageDto<Post> getPosts(@RequestParam("page") int page, @RequestParam("size") int size) {
+		System.out.println(postService.getPosts().size());
 		return convertToDto(postService.getPosts(page, size));
 	}
 
-	@GetMapping(value = "/api/posts/{id}")
+	@GetMapping("/{id}")
 	public Post getPostById(@PathVariable("id") int id) {
 		return postService.getPostById(id);
 	}
 	
-	@PostMapping(value = "/api/posts")
+	@PostMapping
 	public Post addPost(@RequestBody PostRequest postRequest) {
 		return postService.addPost(postRequest);
 	}
 	
-	@PutMapping(value = "/api/posts/{id}")
+	@PutMapping("/{id}")
 	public Post updatePost(@PathVariable("id") int id, @RequestBody PostRequest PostRequest) {
 		return postService.updatePost(id, PostRequest);
 	}
 	
-	@DeleteMapping(value = "/api/posts/{id}")
+	@DeleteMapping("/{id}")
 	public Post deletePost(@PathVariable("id") int id) {
 		return postService.deletePostById(id);
 	}

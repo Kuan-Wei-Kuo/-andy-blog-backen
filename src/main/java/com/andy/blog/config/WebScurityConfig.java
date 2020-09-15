@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,7 +45,7 @@ public class WebScurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${dashboard.username}")
 	private String username;
 
-	@Value("${dashboard.username}")
+	@Value("${dashboard.password}")
 	private String password;
 	
 	@Autowired
@@ -57,14 +58,12 @@ public class WebScurityConfig extends WebSecurityConfigurerAdapter {
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	
 	@Bean
-	public CorsConfigurationSource configurationSource() {
+	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
 		configuration.setAllowedMethods(Arrays.asList(allowedMethods));
 		configuration.setAllowedHeaders(Arrays.asList(allowedHeaders));
 		configuration.setExposedHeaders(Arrays.asList(exposedHeaders));
-		configuration.setAllowCredentials(true);
-		configuration.applyPermitDefaultValues();
 		UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
 		configurationSource.registerCorsConfiguration("/**", configuration);
 		return configurationSource;
@@ -91,7 +90,7 @@ public class WebScurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.cors()
-				.disable()
+				.and()
 			.csrf()
 				.disable()
 			.sessionManagement()
@@ -107,7 +106,7 @@ public class WebScurityConfig extends WebSecurityConfigurerAdapter {
 				.disable()
 			.logout()
 				.disable()
-			.addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtProvider))
+			.addFilterAt(new JwtAuthenticationFilter(authenticationManager(), jwtProvider), UsernamePasswordAuthenticationFilter.class)
 			.addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtProvider, userDetailsService));
 			
 		http.exceptionHandling()

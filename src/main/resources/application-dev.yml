@@ -24,7 +24,7 @@ jwt:
   audience: andy-blog-dashboard
   access:
     expiration:
-      time: 86400
+      time: 43200
     secret: jwt.access.secret
   refresh:
     expiration:
@@ -33,7 +33,7 @@ jwt:
 
 cors:
   allowed:
-    origins: http://localhost:8080
+    origins: http://localhost:3000
     methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
     headers: Authorization, Content-Type
   exposed:
